@@ -1,0 +1,24 @@
+SIPaKMeD MLP33 CLASSIFICATION RESULTS
+============================================================
+
+Dataset: SIPaKMeD
+Data fraction: 1.0
+Epochs: 20
+Batch size: 2048
+Architecture: 33 -> 128 -> 64 -> 2
+
+accuracy: 0.9288528643065105
+precision: 0.9120167316935948
+recall: 0.9492840338530792
+specificity: 0.9084217467798155
+f1_score: 0.9302772964253501
+TN: 356789
+FP: 35968
+FN: 19919
+TP: 372837
+test_loss: 0.18541564047336578
+test_accuracy_keras: 0.9288528561592102
+evaluation_time_seconds: 29.340415239334106
+
+training_time_seconds: 131.05381155014038
+total_time_seconds: 182.54705834388733

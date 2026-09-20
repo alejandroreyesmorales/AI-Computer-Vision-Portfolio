@@ -1,0 +1,35 @@
+CROSS-DATASET MLP33 EVALUATION
+============================================================
+
+Model trained on: CRIC
+Evaluated on: SIPaKMeD
+accuracy: 0.855114
+precision: 0.834105
+recall: 0.886554
+specificity: 0.823673
+f1_score: 0.859530
+TN: 1617516
+FP: 346267
+FN: 222784
+TP: 1740998
+total_samples: 3927565
+evaluation_time_seconds: 20.096632
+
+------------------------------------------------------------
+
+Model trained on: SIPaKMeD
+Evaluated on: CRIC
+accuracy: 0.909677
+precision: 0.892701
+recall: 0.931292
+specificity: 0.888062
+f1_score: 0.911588
+TN: 829905
+FP: 104607
+FN: 64208
+TP: 870303
+total_samples: 1869023
+evaluation_time_seconds: 10.049037
+
+------------------------------------------------------------
+

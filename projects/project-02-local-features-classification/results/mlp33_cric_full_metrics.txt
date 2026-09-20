@@ -1,0 +1,24 @@
+MLP33 - CRIC DATASET
+====================
+
+Number of samples: 1,869,024
+Training epochs: 20
+Batch size: 2048
+Random seed: 42
+
+Metrics
+-------
+accuracy: 0.9458835489091906
+precision: 0.934911829326208
+recall: 0.9584969663245979
+specificity: 0.9332701989802197
+f1_score: 0.9465575043789083
+true_negative: 174431
+false_positive: 12472
+false_negative: 7757
+true_positive: 179145
+
+Execution times
+----------------
+Training time (seconds): 59.35
+Evaluation time (seconds): 0.52
