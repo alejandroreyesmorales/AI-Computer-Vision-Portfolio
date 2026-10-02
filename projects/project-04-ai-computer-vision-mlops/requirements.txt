@@ -1,0 +1,9 @@
+tensorflow
+numpy
+pandas
+scikit-learn
+joblib
+fastapi
+uvicorn
+python-multipart
+pillow
