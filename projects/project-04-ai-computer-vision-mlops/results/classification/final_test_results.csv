@@ -1,0 +1,2 @@
+classifier,accuracy,precision,recall,specificity,f1,tn,fp,fn,tp,feature_extractor,feature_dimension,task,train_samples,test_samples,architecture,hidden_layers,hidden_activation,output_activation,optimizer,loss,epochs,batch_size,random_state,threshold
+MLP,0.9805970149253731,0.9830042116016615,0.9757822586769955,0.9563492063492064,0.9791763791763792,241,11,2,416,ResNet-50,2048,Binary,3379,670,2048-128-64-1,"(128, 64)",ReLU,Sigmoid,Adam,BinaryCrossentropy,50,32,42,0.5

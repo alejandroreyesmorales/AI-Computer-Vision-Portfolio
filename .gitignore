@@ -20,3 +20,8 @@ Thumbs.db
 
 # VS Code local settings
 .vscode/
+
+# Project 4 - local data and model artifacts
+projects/project-04-ai-computer-vision-mlops/data/features/
+projects/project-04-ai-computer-vision-mlops/data/splits/
+projects/project-04-ai-computer-vision-mlops/models/mlp/
