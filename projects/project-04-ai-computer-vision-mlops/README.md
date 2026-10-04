@@ -19,12 +19,12 @@ The current pipeline includes:
 * Final training of the selected MLP using the complete development set.
 * Independent evaluation on a previously unseen test set.
 * Preservation of the trained model and feature scaler as inference artifacts.
-* Implementation of a **FastAPI inference service** for model serving.
-* HTTP endpoints for service health checking and image-based prediction.
-* Automatic API documentation and interactive testing through Swagger UI.
-* Progressive integration of MLOps components into the computer vision pipeline.
+* FastAPI-based inference service.
+* Docker containerization of the inference service.
+* Versioned Docker images for the inference application.
+* Progressive integration of additional MLOps components into the computer vision pipeline.
 
-The project is designed as a portfolio implementation that demonstrates the transition from a deep learning model to a reproducible machine learning inference pipeline and progressively toward an end-to-end MLOps workflow.
+The project is designed as a portfolio implementation that demonstrates the transition from a deep learning model to a reproducible machine learning inference pipeline and, subsequently, to a containerized inference service.
 
 ---
 
@@ -39,9 +39,9 @@ The main objectives of this project are:
 * Select the final classifier using only the development data.
 * Evaluate the selected model once on an independent test set.
 * Preserve the model and preprocessing components required for reproducible inference.
-* Expose the trained model through an API-based inference service.
-* Prepare the model for containerization and subsequent MLOps integration.
-* Extend the classification pipeline toward an end-to-end MLOps workflow.
+* Expose the trained model through a FastAPI inference service.
+* Containerize the inference service using Docker.
+* Establish a foundation for experiment tracking, CI/CD, and monitoring.
 
 ---
 
@@ -286,7 +286,7 @@ models/
     └── scaler.joblib
 ```
 
-`final_model.keras` contains the trained MLP, while `scaler.joblib` stores the `StandardScaler` fitted during final training.
+`final_model.keras` contains the trained MLP, while `scaler.joblib` stores the StandardScaler fitted during final training.
 
 Both artifacts are required to reproduce the preprocessing and prediction steps during inference.
 
@@ -294,13 +294,11 @@ Both artifacts are required to reproduce the preprocessing and prediction steps 
 
 # FastAPI Inference Service
 
-The trained classification pipeline is exposed through a REST API using **FastAPI**.
+The trained classification pipeline was exposed through a REST API using **FastAPI**.
 
-The purpose of this stage is to transform the previously validated machine learning model into a reusable inference service that can receive an image through HTTP and return a prediction.
+The purpose of this stage is to separate the machine learning inference logic from the client application and expose the model as a reusable service.
 
-The API separates the HTTP interface from the internal machine learning inference logic.
-
-The architecture is:
+### Inference Architecture
 
 ```text
 Client
@@ -315,7 +313,7 @@ src/inference.py
   ↓
 ResNet-50
   ↓
-2048-dimensional features
+2048-dimensional feature vector
   ↓
 StandardScaler
   ↓
@@ -326,11 +324,9 @@ Prediction
 JSON response
 ```
 
-This separation allows other applications, such as web or mobile clients, to consume the model through the API without directly accessing or modifying the internal ML pipeline.
+### Inference Components
 
-### Inference Logic
-
-The machine learning inference logic is implemented in:
+The inference logic is implemented in:
 
 ```text
 src/inference.py
@@ -338,39 +334,38 @@ src/inference.py
 
 This module is responsible for:
 
-* Loading the pretrained ResNet-50 feature extractor.
-* Loading the trained MLP classifier.
-* Loading the fitted `StandardScaler`.
-* Receiving an image path.
-* Converting the image to RGB.
-* Resizing the image to `224 × 224`.
-* Applying the ResNet-50 preprocessing function.
-* Extracting the 2,048-dimensional feature vector.
-* Applying the trained scaler.
-* Generating the MLP probability.
-* Converting the probability into the Normal/Abnormal prediction.
+* Loading the ResNet-50 feature extractor.
+* Loading the final MLP classifier.
+* Loading the fitted StandardScaler.
+* Preprocessing the input image.
+* Extracting the 2,048-dimensional feature representation.
+* Applying the same scaling used during training.
+* Generating the Normal/Abnormal prediction.
+* Returning the prediction probability.
 
-The model components are loaded once when the inference module is initialized rather than being reloaded for every prediction request.
-
-### API Logic
-
-The API implementation is located in:
+The API layer is implemented in:
 
 ```text
 api/main.py
 ```
 
-This module is responsible for the HTTP layer rather than the internal ML logic.
+This module is responsible for:
 
-The API currently exposes two endpoints.
+* Creating the FastAPI application.
+* Defining the API endpoints.
+* Validating uploaded files.
+* Receiving image uploads.
+* Creating a temporary image file.
+* Passing the temporary file path to the inference module.
+* Removing the temporary file after inference.
 
-#### Health Endpoint
+The ML inference logic is therefore independent of FastAPI and can be reused by other applications.
 
-```text
-GET /health
-```
+### API Endpoints
 
-This endpoint verifies that the API service is running.
+#### `GET /health`
+
+Used to verify that the service is operational.
 
 Example response:
 
@@ -380,117 +375,293 @@ Example response:
 }
 ```
 
-#### Prediction Endpoint
+#### `POST /predict`
 
-```text
-POST /predict
-```
-
-This endpoint receives an image using `multipart/form-data` and returns the classification generated by the trained model.
+Receives an image and returns the model prediction.
 
 Example response:
 
 ```json
 {
-  "prediction": "Abnormal",
-  "class_id": 1,
-  "probability": 0.9821
+  "prediction": "Normal",
+  "class_id": 0,
+  "probability": 5.57989653440634e-09
 }
 ```
 
-The `probability` represents the model's predicted probability for the Abnormal class.
+The uploaded image is stored temporarily inside the execution environment and removed after prediction.
 
-### Temporary File Handling
+### API Documentation
 
-Uploaded images are temporarily written to disk so that they can be passed to the existing inference function, which operates on an image path.
+FastAPI automatically generates interactive API documentation through Swagger UI.
 
-The workflow is:
-
-```text
-Uploaded image
-      ↓
-FastAPI receives file
-      ↓
-Temporary file created
-      ↓
-predict(temp_path)
-      ↓
-Prediction returned
-      ↓
-Temporary file deleted
-```
-
-The original image selected by the client is not modified or moved.
-
-Temporary files are removed after inference using a `finally` block to ensure cleanup even if an error occurs during prediction.
-
-### Input Validation
-
-The `/predict` endpoint performs basic validation of the uploaded file before running inference.
-
-Files whose declared MIME type is not an image are rejected with an HTTP `400 Bad Request` response.
-
-Example:
-
-```json
-{
-  "detail": "The uploaded file must be an image."
-}
-```
-
-This prevents invalid file types from being passed unnecessarily to the ML inference pipeline.
-
-### Interactive API Documentation
-
-FastAPI automatically generates an OpenAPI specification and an interactive **Swagger UI** interface.
-
-During development, the API can be accessed through:
+When running locally, the documentation is available at:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-Swagger UI provides an interactive interface for:
+The API was tested through Swagger UI using a SIPaKMeD image.
 
-* inspecting available endpoints;
-* uploading an image to `/predict`;
-* executing requests;
-* inspecting HTTP responses;
-* reviewing the generated API contract.
+The final prediction returned HTTP status `200` and correctly classified the tested Parabasal sample as:
 
-Swagger UI is used as a development and testing interface. It is not part of the internal machine learning inference logic.
-
-A custom web or mobile application could consume the same API without using Swagger.
-
-### Running the API Locally
-
-The API is served during development using **Uvicorn**:
-
-```bash
-uvicorn api.main:app --reload
+```text
+Prediction: Normal
+Class ID: 0
 ```
 
-The `--reload` option is used during development so that changes to the source code automatically restart the service.
+---
 
-This behavior is a development convenience and is separate from the production deployment strategy that will be addressed in subsequent MLOps stages.
+# Docker Containerization
 
-### Dependencies for the API Layer
+The FastAPI inference service was containerized using **Docker**.
 
-The API layer uses:
+The objective of this stage is to package the API, Python environment, dependencies, inference code, trained classifier, scaler, and ResNet-50 runtime requirements into a reproducible executable image.
 
-| Dependency       | Role                                            |
-| ---------------- | ----------------------------------------------- |
-| FastAPI          | API framework and endpoint definition           |
-| Uvicorn          | ASGI server used to run the FastAPI application |
-| python-multipart | Multipart/form-data file upload support         |
-| Pillow           | Image loading and preprocessing support         |
+The resulting architecture is:
 
-The API was tested locally through Swagger UI using SIPaKMeD images.
+```text
+Client
+  ↓
+localhost:8000
+  ↓
+Docker container
+  ↓
+Uvicorn
+  ↓
+FastAPI
+  ↓
+ResNet-50 + StandardScaler + MLP
+```
 
-The `/predict` endpoint was verified with both:
+## Docker Image
 
-* a valid `.bmp` image, producing a successful prediction;
-* a non-image file, correctly returning HTTP `400 Bad Request`.
+The Docker image is defined by:
+
+```text
+Dockerfile
+```
+
+The image uses:
+
+```text
+python:3.12-slim
+```
+
+and installs the dependencies listed in:
+
+```text
+requirements.txt
+```
+
+Only the components required for inference are included in the image:
+
+```text
+api/
+└── main.py
+
+src/
+└── inference.py
+
+models/
+└── mlp/
+    ├── final_model.keras
+    └── scaler.joblib
+```
+
+Training scripts, datasets, feature CSV files, results, Git metadata, and other unnecessary development files are excluded from the Docker build context.
+
+### Docker Build Context
+
+The following `.dockerignore` file is used:
+
+```text
+data/
+results/
+
+.git/
+.gitignore
+
+__pycache__/
+*.pyc
+*.pyo
+
+README.md
+```
+
+This prevents large datasets, generated features, results, Git metadata, and Python cache files from being sent to the Docker build context.
+
+---
+
+## Docker Image Versions
+
+Two versions of the Docker image were created during development.
+
+### Version 1.0
+
+```text
+sipakmed-api:1.0
+```
+
+The first Docker image successfully packaged and executed the FastAPI inference service.
+
+The initial architecture was functional:
+
+```text
+FastAPI
+  ↓
+Uvicorn
+  ↓
+ResNet-50
+  ↓
+StandardScaler
+  ↓
+MLP
+```
+
+During container startup, however, Keras downloaded the ResNet-50 ImageNet weights because they were not yet present in the container.
+
+The logs showed:
+
+```text
+Downloading data from https://storage.googleapis.com/...
+```
+
+The image was therefore functional but still depended on an external download when ResNet-50 was initialized for the first time.
+
+### Version 1.1
+
+```text
+sipakmed-api:1.1
+```
+
+Version 1.1 addressed the dependency identified during testing.
+
+The Dockerfile was modified to initialize ResNet-50 during the image build:
+
+```dockerfile
+RUN python -c "from tensorflow.keras.applications import ResNet50; ResNet50(weights='imagenet', include_top=False, pooling='avg')"
+```
+
+This causes the ImageNet weights to be downloaded during `docker build` and stored in the resulting Docker image.
+
+The resulting workflow is:
+
+```text
+docker build
+      ↓
+ResNet-50 initialized
+      ↓
+ImageNet weights downloaded
+      ↓
+Weights stored in Docker image
+      ↓
+docker run
+      ↓
+ResNet-50 loads locally
+```
+
+As a result, the version 1.1 container started without downloading the ResNet-50 weights.
+
+### Docker Version Comparison
+
+| Version            | ResNet-50 weights                   | Result                             |
+| ------------------ | ----------------------------------- | ---------------------------------- |
+| `sipakmed-api:1.0` | Downloaded during container startup | Functional                         |
+| `sipakmed-api:1.1` | Included during image build         | Functional and more self-contained |
+
+This iteration demonstrates a practical MLOps workflow in which container behavior was inspected through logs, an external runtime dependency was identified, and the Docker image was subsequently improved.
+
+---
+
+## Docker Layer Caching
+
+Docker's layer caching was also observed during the creation of version 1.1.
+
+When the Dockerfile was rebuilt, unchanged layers were reused:
+
+```text
+CACHED [2/8] WORKDIR /app
+CACHED [3/8] COPY requirements.txt .
+CACHED [4/8] RUN pip install --no-cache-dir -r requirements.txt
+```
+
+Therefore, the Python dependencies did not need to be installed again.
+
+Only the newly introduced ResNet-50 initialization step and subsequent image layers were rebuilt.
+
+This reduced the build time from approximately 12 minutes for the initial image to less than one minute for the updated image.
+
+---
+
+## Docker Validation
+
+The containerized service was validated through several tests.
+
+### Container Status
+
+The container was executed using:
+
+```powershell
+docker run -d --name sipakmed-api-container -p 8000:8000 sipakmed-api:1.1
+```
+
+The port mapping exposes the container's port 8000 through the host's port 8000.
+
+### Health Check
+
+The endpoint was tested through:
+
+```text
+http://localhost:8000/health
+```
+
+The service returned:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+with HTTP status `200`.
+
+### Prediction Test
+
+The `/predict` endpoint was tested through Swagger UI using a SIPaKMeD image.
+
+The container returned:
+
+```json
+{
+  "prediction": "Normal",
+  "class_id": 0,
+  "probability": 5.57989653440634e-09
+}
+```
+
+with HTTP status `200`.
+
+### Container Logs
+
+The Docker logs confirmed:
+
+```text
+Uvicorn running on http://0.0.0.0:8000
+```
+
+and, for version 1.1, no ResNet-50 weight download occurred during container startup.
+
+The logs also confirmed successful API requests:
+
+```text
+GET /health
+GET /docs
+GET /openapi.json
+POST /predict
+```
+
+Therefore, the complete inference pipeline was successfully executed inside the Docker container.
 
 ---
 
@@ -521,12 +692,16 @@ project-04-ai-computer-vision-mlops/
 │   ├── classification_model_selection.py
 │   ├── train_final_classifier.py
 │   └── inference.py
+├── .dockerignore
 ├── .gitignore
+├── Dockerfile
 ├── README.md
 └── requirements.txt
 ```
 
 Original medical images, generated feature files, trained model artifacts, and other local data are not intended to be uploaded to the public repository unless explicitly required for deployment or reproducibility.
+
+The Docker image contains only the components required to execute the inference service.
 
 ---
 
@@ -546,19 +721,19 @@ The project is being developed progressively toward an end-to-end MLOps workflow
 * [x] Independent TEST evaluation
 * [x] Model and scaler artifact generation
 * [x] FastAPI inference service
-* [x] `/health` and `/predict` endpoints
-* [x] Image upload handling
-* [x] Basic input validation
-* [x] Interactive API testing through Swagger UI
+* [x] API endpoint validation
+* [x] Docker containerization
+* [x] Docker image versioning
+* [x] Containerized inference validation
 
 ### Planned
 
-* [ ] Docker containerization
 * [ ] MLflow experiment tracking and model management
 * [ ] CI/CD automation
 * [ ] Basic inference monitoring
+* [ ] Deployment
 
-The MLOps components will be added incrementally while preserving the same trained model and preprocessing pipeline.
+The MLOps components are being added incrementally while preserving the same trained model and preprocessing pipeline.
 
 ---
 
@@ -571,12 +746,12 @@ The MLOps components will be added incrementally while preserving the same train
 | scikit-learn       | Data splitting, cross-validation, scaling, and classical classifiers |
 | Pandas             | Dataset and feature management                                       |
 | NumPy              | Numerical computation                                                |
-| FastAPI            | ML inference API                                                     |
-| Uvicorn            | ASGI server for local API execution                                  |
-| python-multipart   | Multipart file upload support                                        |
-| Pillow             | Image loading and preprocessing                                      |
 | Git                | Version control                                                      |
-| Docker             | Planned containerization                                             |
+| FastAPI            | Inference API                                                        |
+| Uvicorn            | ASGI server for FastAPI                                              |
+| python-multipart   | Multipart file upload handling                                       |
+| Pillow             | Image loading and preprocessing                                      |
+| Docker             | Containerization and reproducible inference environment              |
 | MLflow             | Planned experiment tracking and model management                     |
 | GitHub Actions     | Planned CI/CD                                                        |
 
@@ -584,13 +759,13 @@ The MLOps components will be added incrementally while preserving the same train
 
 ## Status
 
-**Current status: Classification pipeline and FastAPI inference service completed.**
+**Current status: Classification pipeline, FastAPI inference service, and Docker containerization completed.**
 
-The project has progressed from SIPaKMeD data preparation and deep feature extraction to classifier selection, independent final evaluation, and deployment of the trained model through a local FastAPI inference service.
+The project has progressed from SIPaKMeD data preparation and deep feature extraction to classifier selection, independent final evaluation, API-based inference, and containerized deployment.
 
-The current API successfully receives image files, executes the complete ResNet-50 → scaler → MLP inference pipeline, returns a JSON prediction, and performs basic input validation and temporary-file cleanup.
+The Docker inference service has been validated using both health and prediction endpoints.
 
-The next development stage is **Docker containerization**, which will package the inference service and its software environment into a reproducible container.
+The next development stage is the integration of **MLflow** for experiment tracking and model management, followed by CI/CD automation and basic inference monitoring.
 
 ---
 
@@ -600,5 +775,5 @@ The next development stage is **Docker containerization**, which will package th
 
 AI / Computer Vision / Machine Learning
 
-* LinkedIn: Alejandro Reyes Morales
-* GitHub: Alejandro Reyes Morales
+* LinkedIn: https://www.linkedin.com/in/alejandro-reyes-morales
+* GitHub: https://github.com/alejandroreyesmorales
