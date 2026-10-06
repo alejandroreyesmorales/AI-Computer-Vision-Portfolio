@@ -1,27 +1,67 @@
+# ============================================
+# Python
+# ============================================
 
-# Python cache
 __pycache__/
 *.py[cod]
+*.so
 
+# ============================================
 # Virtual environments
+# ============================================
+
 .venv/
 venv/
 env/
 
-# Jupyter Notebook checkpoints
+# ============================================
+# Jupyter Notebook
+# ============================================
+
 .ipynb_checkpoints/
 
+# ============================================
 # Operating system files
+# ============================================
+
 .DS_Store
 Thumbs.db
 
+# ============================================
 # Local configuration
-.env
+# ============================================
 
-# VS Code local settings
+.env
+.env.*
+
+# ============================================
+# VS Code
+# ============================================
+
 .vscode/
 
-# Project 4 - local data and model artifacts
+# ============================================
+# Project 4 - local data
+# ============================================
+
 projects/project-04-ai-computer-vision-mlops/data/features/
 projects/project-04-ai-computer-vision-mlops/data/splits/
-projects/project-04-ai-computer-vision-mlops/models/mlp/
+
+# ============================================
+# Project 4 - local models
+# ============================================
+
+projects/project-04-ai-computer-vision-mlops/models/
+
+# ============================================
+# Project 4 - MLflow local tracking
+# ============================================
+
+projects/project-04-ai-computer-vision-mlops/mlflow.db
+projects/project-04-ai-computer-vision-mlops/mlruns/
+
+# ============================================
+# Project 4 - experimental results
+# ============================================
+
+projects/project-04-ai-computer-vision-mlops/results/

@@ -6,12 +6,12 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download and cache ResNet-50 ImageNet weights during image build
-RUN python -c "from tensorflow.keras.applications import ResNet50; ResNet50(weights='imagenet', include_top=False, pooling='avg')"
-
 COPY api/ ./api/
 COPY src/inference.py ./src/inference.py
-COPY models/ ./models/
+
+COPY models/resnet50/ft-a/resnet50_ft-a.keras ./models/resnet50/ft-a/
+COPY models/mlp/final_model_ft_a.keras ./models/mlp/
+COPY models/mlp/scaler_ft_a.joblib ./models/mlp/
 
 EXPOSE 8000
 
