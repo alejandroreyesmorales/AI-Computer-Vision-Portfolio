@@ -46,6 +46,10 @@ The current pipeline includes:
 
 * Validation of the containerized service through `/health` and `/predict`.
 
+* Automated testing of the inference pipeline and API.
+
+* Continuous Integration (CI) using GitHub Actions.
+
 The project is designed as a portfolio implementation demonstrating the transition from a deep learning model to a reproducible machine learning pipeline and, subsequently, to a tracked, API-based, and containerized inference service.
 
 ---
@@ -963,6 +967,54 @@ Binary prediction
 
 ---
 
+# Automated Testing and Continuous Integration
+
+Automated tests were added to validate the main components of the inference pipeline and the FastAPI application.
+
+The test suite covers:
+
+* Model and scaler loading.
+
+* ResNet-50 feature-extractor output dimensionality.
+
+* Inference predictions and output format.
+
+* FastAPI `/health` endpoint.
+
+* FastAPI `/predict` endpoint.
+
+The complete test suite can be executed locally with:
+
+```powershell
+pytest tests
+```
+
+The local test suite completed successfully:
+
+```text
+9 passed
+```
+
+## GitHub Actions
+
+Continuous Integration (CI) was implemented using **GitHub Actions**.
+
+The workflow is stored at:
+
+```text
+.github/
+└── workflows/
+    └── ci.yml
+```
+
+The CI workflow runs automatically when changes are pushed to `main` or when a pull request targets `main`.
+
+The purpose of this stage is to automatically validate repository changes before they are considered ready to integrate.
+
+CI is focused on **validation**, not deployment. A successful CI run does not automatically create or deploy a new Docker image.
+
+---
+
 # Docker Layer and Artifact Strategy
 
 The Docker build was also used to verify that only the inference components are required at runtime.
@@ -1102,6 +1154,10 @@ FastAPI
 Docker 1.2
     ↓
 Container validation
+    ↓
+Automated tests
+    ↓
+GitHub Actions CI
 ```
 
 This workflow separates model development from deployment and maintains the independent test set as the final evaluation reference.
@@ -1154,9 +1210,13 @@ This workflow separates model development from deployment and maintains the inde
 
 * [x] Containerized inference validation
 
-## Planned
+* [x] Automated testing
 
-* [ ] CI/CD automation
+* [x] Continuous Integration (CI) with GitHub Actions
+
+## Planned / Future Work
+
+* [ ] Continuous Delivery (CD) and automated Docker image release/deployment
 
 * [ ] Basic inference monitoring
 
@@ -1182,7 +1242,7 @@ This workflow separates model development from deployment and maintains the inde
 | MLflow             | Experiment tracking, metrics, artifacts, and model management                |
 | Git                | Version control                                                              |
 | GitHub             | Source-code repository                                                       |
-| GitHub Actions     | Planned CI/CD                                                                |
+| GitHub Actions     | Continuous Integration (CI)                                                   |
 
 ---
 
@@ -1212,6 +1272,8 @@ The project has progressed from SIPaKMeD data preparation and deep feature extra
 
 10. Validation of the final containerized inference service.
 
+11. Automated testing and Continuous Integration with GitHub Actions.
+
 The selected production-style inference pipeline is:
 
 ```text
@@ -1239,7 +1301,7 @@ The final Docker image is:
 sipakmed-api:1.2
 ```
 
-The project is now ready to move to the next MLOps stage: **CI/CD automation and basic inference monitoring**.
+The project has completed the **Continuous Integration (CI)** stage. **Continuous Delivery (CD)** and basic inference monitoring remain as future work.
 
 ---
 
