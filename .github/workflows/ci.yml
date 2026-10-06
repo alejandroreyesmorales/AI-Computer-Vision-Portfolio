@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: projects/project-04-ai-computer-vision-mlops
+
 jobs:
   test:
     runs-on: ubuntu-latest
