@@ -1,13 +1,12 @@
-
 # Alejandro Reyes Morales
 
 ## AI / Computer Vision Engineer
 
-Machine Learning | Deep Learning | Computer Vision | Image Processing | HPC
+Machine Learning | Deep Learning | Computer Vision | Image Processing | MLOps | HPC
 
-I am an AI / Computer Vision Engineer with a background in Machine Learning, Deep Learning, and digital image processing.
+I am an AI / Computer Vision Engineer with a background in Machine Learning, Deep Learning, digital image processing, and MLOps.
 
-My experience includes developing end-to-end solutions for image-based problems, from data preparation and experimental design to model development, evaluation, and validation.
+My experience includes developing end-to-end solutions for image-based problems, from data preparation and experimental design to model development, evaluation, validation, and deployment-oriented workflows.
 
 My main areas of interest include:
 
@@ -16,6 +15,7 @@ My main areas of interest include:
 - Industrial Vision
 - Scientific Imaging
 - Applied Artificial Intelligence
+- Machine Learning and MLOps
 - High-Performance Computing
 
 ## Technical Skills
@@ -24,9 +24,15 @@ My main areas of interest include:
 
 **Machine Learning:** Machine Learning, Deep Learning, CNNs, Transfer Learning, Fine-Tuning, Classification, Segmentation, Object Detection
 
+**Computer Vision:** Image Processing, Feature Extraction, Image Classification, Image Segmentation, Object Detection
+
 **Frameworks and Libraries:** TensorFlow, Keras, PyTorch, scikit-learn, OpenCV
 
-**Computing:** Linux, HPC, SLURM, CPU/GPU Computing, Bash
+**MLOps and Deployment:** MLflow, FastAPI, Uvicorn, Docker, REST APIs, Swagger/OpenAPI, Pytest, GitHub Actions, Automated Testing
+
+**Computing and Systems:** Linux, HPC, SLURM, CPU/GPU Computing, Bash, SSH
+
+**Version Control:** Git, GitHub
 
 ## Research Experience
 
@@ -36,7 +42,7 @@ The work includes cell detection, segmentation, localization, and classification
 
 ## Portfolio
 
-This repository contains selected projects and practical implementations related to Artificial Intelligence, Computer Vision, and Image Processing.
+This repository contains selected projects and practical implementations related to Artificial Intelligence, Computer Vision, Machine Learning, Image Processing, and MLOps.
 
 ## Contact
 
