@@ -37,7 +37,7 @@ The objective of the public repository is to provide a manageable and understand
 
 ### SIPaKMeD
 
-The SIPaKMeD dataset was used for CNN architecture comparison, fine-tuning, feature extraction, and internal classification experiments.
+The SIPaKMeD dataset [1] was used for CNN architecture comparison, fine-tuning, feature extraction, and internal classification experiments.
 
 The dataset contains five cervical cell categories:
 
@@ -67,7 +67,7 @@ Cross-validation was performed only on the development subset using grouped and 
 
 ### Herlev
 
-The Herlev dataset was used for external validation under different acquisition conditions.
+The Herlev dataset [2] was used for external validation under different acquisition conditions.
 
 The external evaluation was designed as a binary classification problem by grouping the cell categories into normal and abnormal classes. The complete external-validation campaign belongs to the original research and is not fully reproduced in the current public implementation.
 
@@ -474,9 +474,11 @@ The repository contains the public scripts and selected generated results. Origi
 | Pandas |
 | Matplotlib |
 
-## Status
+## References
 
-Selected local implementation with extractor comparison and preliminary classification results documented.
+[1] M. E. Plissiti, P. Dimitrakopoulos, G. Sfikas, C. Nikou, O. Krikoni, and A. Charchanti, "SIPAKMED: A New Dataset for Feature and Image Based Classification of Normal and Pathological Cervical Cells in Pap Smear Images," in *2018 25th IEEE International Conference on Image Processing (ICIP)*, 2018, pp. 3144–3148. DOI: 10.1109/ICIP.2018.8451588.
+
+[2] J. Jantzen, J. Norup, G. Dounias, and B. Bjerregaard, "Pap-smear Benchmark Data For Pattern Classification," in *Nature Inspired Smart Information Systems (NiSIS)*, 2005, pp. 1–9. Available through the DTU Research Database.
 
 ## Author
 
