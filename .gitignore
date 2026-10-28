@@ -65,3 +65,17 @@ projects/project-04-ai-computer-vision-mlops/mlruns/
 # ============================================
 
 projects/project-04-ai-computer-vision-mlops/results/
+# ============================================
+# Project 5 - local data
+# ============================================
+
+projects/project-05-pyspark-clinical-ml/data/
+
+# ============================================
+# Project 5 - local models & spark-warehouse
+# ============================================
+
+projects/project-05-pyspark-clinical-ml/models/
+projects/project-05-pyspark-clinical-ml/spark-warehouse/
+projects/project-05-pyspark-clinical-ml/metastore_db/
+projects/project-05-pyspark-clinical-ml/derby.log
